@@ -1,0 +1,214 @@
+# API Implementation Exercise
+
+In this exercise, you will implement an API in Golang that enables users to send requests for reading and writing alert data to a data storage system.
+
+## Guidelines
+
+- You can chose any storage system; a relational database, a file system, or even an in-memory data structure.
+
+
+## Write Alerts
+
+Users should be able to send requests to this API to write alert data to the chosen data storage.
+
+### Write Request
+
+**HTTP Method:** POST
+
+**Endpoint:** /alerts
+
+**Request Body:**
+
+```json
+{
+   "alert_id": "b950482e9911ec7e41f7ca5e5d9a424f",
+   "service_id": "my_test_service_id",
+   "service_name": "my_test_service",
+   "model": "my_test_model",
+   "alert_type": "anomaly",
+   "alert_ts": "1695644160",
+   "severity": "warning",
+   "team_slack": "slack_ch"
+}
+```
+
+### Write Response
+
+Success
+
+**HTTP Status Code:** 200 OK
+
+**Response Body:**
+
+```json
+{
+   "alert_id": "b950482e9911ec7e41f7ca5e5d9a424f",
+   "error": ""
+}
+```
+
+Error
+
+**HTTP Status Code:** 500 Internal Server Error
+
+**Response Body:**
+
+```json
+{
+   "alert_id": "b950482e9911ec7e41f7ca5e5d9a424f",
+   "error": "<error details>"
+}
+```
+
+
+## Read Alerts
+
+Users should be able to query alerts using the `service_id` and specifying a time period defined by `start_ts` and `end_ts`.
+
+### Read Request
+
+**HTTP Method:** GET
+
+**Endpoint:** /alerts
+
+**Query Parameters:**
+
+- `service_id`: The identifier of the service for which alerts are requested.
+- `start_ts`: The starting timestamp epoch of the time period.
+- `end_ts`: The ending timestamp epoch of the time period.
+
+**Example:** `/alerts?service_id=my_test_service_id&start_ts=1695643160&end_ts=1695644360`
+
+### Read Response
+
+Success
+
+**HTTP Status Code:**  200 OK
+
+**Response Body:**
+
+```json
+{
+   "service_id" : "my_test_service_id"
+   "service_name": "my_test_service",
+   "alerts" : [
+      {
+      "alert_id": "b950482e9911ec7e41f7ca5e5d9a424f",
+      "model": "my_test_model",
+      "alert_type": "anomaly",
+      "alert_ts": "1695644060",
+      "severity": "warning",
+      "team_slack": "slack_ch"
+      },
+      {
+         "alert_id": "b950482e9911ecsdfs41f75e5d9az23cv",
+         "model": "my_test_model",
+         "alert_type": "anomaly",
+         "alert_ts": "1695644160",
+         "severity": "warning",
+         "team_slack": "slack_ch"
+      },
+   ]
+}
+```
+
+Error
+
+**HTTP Status Code:** Appropriate HTTP error status (e.g., 400 Bad Request, 404 Not Found, 500 Internal Server Error)
+
+**Response Body:**
+
+```json
+{
+   "alert_id": "b950482e9911ec7e41f7ca5e5d9a424f",
+   "error": "<error details>"
+}
+```
+
+
+
+## Skeleton Project for Golang
+
+Here is a sample skeleton code with chi router to get started:
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    "net/http"
+    "encoding/json"
+    "github.com/go-chi/chi"
+)
+
+type Alert struct {
+    AlertID     string `json:"alert_id"`
+    ServiceID   string `json:"service_id"`
+    ServiceName string `json:"service_name"`
+    Model       string `json:"model"`
+    AlertType   string `json:"alert_type"`
+    AlertTS     string `json:"alert_ts"`
+    Severity    string `json:"severity"`
+    TeamSlack   string `json:"team_slack"`
+}
+
+var alerts []Alert
+
+func main() {
+    // Router setup
+    r := chi.NewRouter()
+
+    // Route requests
+    r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+        w.Write([]byte("Hello from home"))
+    })
+
+    r.Post("/alerts", WriteAlert)
+    r.Get("/alerts", ReadAlerts)
+
+    // Server start
+    srv := &http.Server{
+        Addr:    fmt.Sprintf(":%s", "8080"),
+        Handler: r,
+    }
+
+    log.Println("Server started...")
+    if err := srv.ListenAndServe(); err != nil {
+        log.Fatal(fmt.Sprintf("%+v", err))
+    }
+}
+
+// POST Request Handler (Write Alert)
+func WriteAlert(w http.ResponseWriter, r *http.Request) {
+    // 1. Parse the JSON request body
+
+    // 2. Validate the input data
+
+    // 3. Store the alert data
+
+    // 4. Handle errors
+
+    // 5. Respond with an appropriate HTTP status code and JSON response
+}
+
+// GET Request Handler (Read Alerts)
+func ReadAlerts(w http.ResponseWriter, r *http.Request) {
+    // 1. Parse and validate query parameters
+
+    // 2. Query data storage to retrieve alerts
+
+    // 3. Create a response JSON object
+
+    // 4. Handle errors
+
+    // 5. Respond with an appropriate HTTP status code and JSON response
+}
+
+```
+
+This code adds the necessary routes for writing and reading alerts. You should fill in the details of each step according to your specific requirements and chosen data storage solution.
+
+Make sure to import the required packages (encoding/json and github.com/go-chi/chi) and handle error cases appropriately. Also, consider adding unit tests to verify the functionality of your API.
+
+
